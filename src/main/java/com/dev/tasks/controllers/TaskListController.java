@@ -1,0 +1,38 @@
+package com.dev.tasks.controllers;
+
+import com.dev.tasks.domain.dto.TaskListDto;
+import com.dev.tasks.domain.entities.TaskList;
+import com.dev.tasks.mappers.TaskListMapper;
+import com.dev.tasks.services.TaskListService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(path = "/task-lists")
+public class TaskListController {
+
+    private final TaskListService taskListService;
+
+    private final TaskListMapper taskListMapper;
+
+    public TaskListController(TaskListService taskListService, TaskListMapper taskListMapper) {
+        this.taskListService = taskListService;
+        this.taskListMapper = taskListMapper;
+    }
+
+    @GetMapping
+    public List<TaskListDto> listTaskLists() {
+        return taskListService.listTaskLists()
+                .stream()
+                .map(taskListMapper::toTaskListDto)
+                .toList();
+    }
+
+    @PostMapping
+    public TaskListDto createTaskList(@RequestBody TaskListDto taskListDto) {
+        TaskList createdTaskList = taskListService.createTaskList(taskListMapper.toTaskList(taskListDto));
+
+        return taskListMapper.toTaskListDto(createdTaskList);
+    }
+}
